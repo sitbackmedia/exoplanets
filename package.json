@@ -38,6 +38,8 @@
     ]
   },
   "devDependencies": {
+    "fetch-mock": "^7.4.0",
+    "redux-mock-store": "^1.5.3",
     "standard": "^14.3.1"
   }
 }

@@ -103,7 +103,9 @@ export function load () {
 // Selectors
 
 export const getOrphanPlanets = state => filter(state.planets.all, { TypeFlag: 3 })
+
 export const getPlanets = state => orderBy(state.planets.all, ['DiscoveryYear'], ['desc'])
+
 export const getPlanetsGroupedByYearAndSize = state => (
   chain(state.planets.all)
     .groupBy('DiscoveryYear')
@@ -121,6 +123,7 @@ export const getPlanetsGroupedByYearAndSize = state => (
     .value()
 )
 export const getPlanetWithHottestStar = state => maxBy(state.planets.all, 'HostStarTempK')
+
 export const isPlanetsLoading = state => state.planets.isLoading
 
 /**
