@@ -2,6 +2,14 @@ import {
   PlanetsAPI
 } from 'api'
 
+import {
+  filter,
+  groupBy,
+  orderBy,
+  chain,
+  maxBy
+} from 'lodash'
+
 // Main Action Types
 
 const LOAD_ERROR = 'planets/finding/LOAD_ERROR'
@@ -86,7 +94,7 @@ export function load () {
       const planets = await response.json()
       dispatch(loadSuccess(planets))
     } catch (error) {
-      dispatch(loadError)
+      dispatch(loadError())
       throw error
     }
   }
@@ -94,7 +102,26 @@ export function load () {
 
 // Selectors
 
-export const getPlanets = state => state.planets.all
+export const getOrphanPlanets = state => filter(state.planets.all, { TypeFlag: 3 })
+export const getPlanets = state => orderBy(state.planets.all, ['DiscoveryYear'], ['desc'])
+export const getPlanetsGroupedByYearAndSize = state => (
+  chain(state.planets.all)
+    .groupBy('DiscoveryYear')
+    .mapValues(year => (
+      groupBy(year, planet => {
+        if (planet.RadiusJpt < 1) {
+          return 'small'
+        } else if (planet.RadiusJpt < 2) {
+          return 'medium'
+        } else {
+          return 'large'
+        }
+      })
+    ))
+    .value()
+)
+export const getPlanetWithHottestStar = state => maxBy(state.planets.all, 'HostStarTempK')
+export const isPlanetsLoading = state => state.planets.isLoading
 
 /**
  * Fetch doesn't handle errors so this

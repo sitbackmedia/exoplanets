@@ -9,8 +9,15 @@ import * as PlanetActions from 'redux/modules/planets'
 import './App.css'
 
 import {
-  Button
+  Container
 } from 'reactstrap'
+
+import {
+  FullPageLoader,
+  PlaceholderNoPlanets,
+  PlanetHighlights,
+  PlanetsList
+} from 'components'
 
 /**
  * Connects the Redux State to this
@@ -21,6 +28,8 @@ import {
  * propName: state.namespace.property
  */
 const mapStateToProps = (state) => ({
+  isPlanetsLoading: PlanetActions.isPlanetsLoading(state),
+  orphanPlanets: PlanetActions.getOrphanPlanets(state),
   planets: PlanetActions.getPlanets(state)
 })
 
@@ -43,6 +52,8 @@ class App extends React.Component {
    * @type {Object}
    */
   static propTypes = {
+    isPlanetsLoading: PropTypes.bool,
+    orphanPlanets: PropTypes.array,
     planets: PropTypes.array
   }
 
@@ -83,35 +94,44 @@ class App extends React.Component {
    * @return {JSX}
    */
   render () {
+    const {
+      isPlanetsLoading,
+      planets
+    } = this.props
+
     return (
 
-      <div
-        className="container mt-5">
+      <Container
+        className="mt-5">
 
-        <div className="spinner-border" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
+        {/* For loading the planets */}
 
-        <div className="spinner-border text-warning" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
+        <FullPageLoader
+          isLoading={isPlanetsLoading} />
 
-        <Button color="primary" type="button">
-          Button
-        </Button>
-        <Button className="btn-icon btn-3" color="primary" type="button">
-          <span className="btn-inner--icon">
-            <i className="ni ni-bag-17" />
-          </span>
-          <span className="btn-inner--text">With icon</span>
-        </Button>
-        <Button className="btn-icon btn-2" color="primary" type="button">
-          <span className="btn-inner--icon">
-            <i className="ni ni-atom" />
-          </span>
-        </Button>
+        {/* Render the list of planets */}
 
-      </div>
+        {(planets.length > 0 && !isPlanetsLoading) && (
+
+          <div>
+
+            <PlanetHighlights />
+
+            <PlanetsList />
+
+          </div>
+
+        )}
+
+        {/* For no results found */}
+
+        {(planets.length === 0 && !isPlanetsLoading) && (
+
+          <PlaceholderNoPlanets />
+
+        )}
+
+      </Container>
 
     )
   }
